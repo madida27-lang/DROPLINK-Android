@@ -1,4 +1,4 @@
-name: Build DROPLINK APK
+name: Build DROPLINK APKs
 
 on:
   workflow_dispatch:
@@ -32,15 +32,24 @@ jobs:
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Build debug APK
-        run: gradle :app:assembleDebug --stacktrace
+      - name: Build Driver and Customer APKs
+        run: gradle :app:assembleDebug :customer:assembleDebug --stacktrace
 
-      - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk DROPLINK.apk
+      - name: Rename APKs
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk DROPLINK-Driver.apk
+          cp customer/build/outputs/apk/debug/customer-debug.apk DROPLINK-Customer.apk
 
-      - name: Upload APK
+      - name: Upload Driver APK
         uses: actions/upload-artifact@v4
         with:
-          name: DROPLINK-APK
-          path: DROPLINK.apk
+          name: DROPLINK-Driver-APK
+          path: DROPLINK-Driver.apk
+          if-no-files-found: error
+
+      - name: Upload Customer APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DROPLINK-Customer-APK
+          path: DROPLINK-Customer.apk
           if-no-files-found: error
