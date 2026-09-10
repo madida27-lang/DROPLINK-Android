@@ -1,0 +1,75 @@
+CREATE TABLE users (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  role ENUM('customer','driver','admin') NOT NULL,
+  name VARCHAR(120) NOT NULL,
+  phone VARCHAR(40) NOT NULL UNIQUE,
+  email VARCHAR(190) NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE api_tokens (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  token_hash CHAR(64) NOT NULL UNIQUE,
+  expires_at DATETIME NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_tokens_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX(user_id), INDEX(expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE orders (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  public_id VARCHAR(32) NOT NULL UNIQUE,
+  customer_id INT UNSIGNED NOT NULL,
+  driver_id INT UNSIGNED NULL,
+  pickup VARCHAR(255) NOT NULL,
+  dropoff VARCHAR(255) NOT NULL,
+  sender_name VARCHAR(120) NULL,
+  sender_phone VARCHAR(40) NULL,
+  receiver_name VARCHAR(120) NULL,
+  receiver_phone VARCHAR(40) NULL,
+  package_size VARCHAR(60) NOT NULL,
+  notes TEXT NULL,
+  payment_method VARCHAR(60) NOT NULL DEFAULT 'Cash',
+  delivery_fee DECIMAL(10,2) NOT NULL DEFAULT 0,
+  driver_tip DECIMAL(10,2) NOT NULL DEFAULT 0,
+  status VARCHAR(60) NOT NULL DEFAULT 'Searching for driver',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_orders_customer FOREIGN KEY (customer_id) REFERENCES users(id),
+  CONSTRAINT fk_orders_driver FOREIGN KEY (driver_id) REFERENCES users(id),
+  INDEX(customer_id), INDEX(driver_id), INDEX(status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE messages (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  order_id BIGINT UNSIGNED NOT NULL,
+  sender_id INT UNSIGNED NOT NULL,
+  recipient_scope ENUM('customer','driver','control') NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_messages_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  CONSTRAINT fk_messages_sender FOREIGN KEY (sender_id) REFERENCES users(id),
+  INDEX(order_id, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE driver_locations (
+  driver_id INT UNSIGNED PRIMARY KEY,
+  latitude DECIMAL(10,7) NOT NULL,
+  longitude DECIMAL(10,7) NOT NULL,
+  accuracy_m DECIMAL(10,2) NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_location_driver FOREIGN KEY (driver_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE delivery_proofs (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  order_id BIGINT UNSIGNED NOT NULL UNIQUE,
+  recipient_name VARCHAR(120) NULL,
+  note TEXT NULL,
+  photo_url VARCHAR(500) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_proof_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -1,1 +1,1 @@
-# DropLink test build
+-keepclassmembers class * { @android.webkit.JavascriptInterface <methods>; }

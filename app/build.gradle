@@ -1,23 +1,4 @@
-plugins {
-    id 'com.android.application'
-}
-
-android {
-    namespace 'za.co.deutronomagroup.droplink'
-    compileSdk 35
-
-    defaultConfig {
-        applicationId 'za.co.deutronomagroup.droplink'
-        minSdk 24
-        targetSdk 35
-        versionCode 1
-        versionName '1.0-test'
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-}
+plugins { id 'com.android.application' }
+android { namespace 'za.co.deutronomagroup.droplink.driver'; compileSdk 36
+ defaultConfig { applicationId 'za.co.deutronomagroup.droplink.driver'; minSdk 24; targetSdk 36; versionCode 1; versionName '1.0.0' }
+ buildTypes { release { minifyEnabled true; shrinkResources true; proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro' } } }
