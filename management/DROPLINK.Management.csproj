@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>DROPLINK-Management</AssemblyName>
+    <RootNamespace>DROPLINK.Management</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../app/src/main/assets/deutronoma_symbol.png" Link="Assets/deutronoma_symbol.png" LogicalName="DROPLINK.Management.deutronoma_symbol.png" />
+  </ItemGroup>
+</Project>
