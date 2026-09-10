@@ -11,4 +11,7 @@
   <ItemGroup>
     <EmbeddedResource Include="../app/src/main/assets/deutronoma_symbol.png" Link="Assets/deutronoma_symbol.png" LogicalName="DROPLINK.Management.deutronoma_symbol.png" />
   </ItemGroup>
+  <Target Name="FixSidebarSource" BeforeTargets="CoreCompile">
+    <Exec Command="powershell -NoProfile -Command &quot;$p='$(MSBuildProjectDirectory)\Program.cs'; (Get-Content $p -Raw).Replace('Bottom = 25,','Top = 700,') | Set-Content $p&quot;" />
+  </Target>
 </Project>
