@@ -1,4 +1,4 @@
-name: Build DROPLINK APKs
+name: Build DROPLINK Apps
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  android:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -52,4 +52,28 @@ jobs:
         with:
           name: DROPLINK-Customer-APK
           path: DROPLINK-Customer.apk
+          if-no-files-found: error
+
+  management-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish Windows Management App
+        shell: pwsh
+        run: |
+          dotnet publish management/DROPLINK.Management.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -o management-publish
+          Copy-Item "management-publish/DROPLINK-Management.exe" "DROPLINK-Management.exe"
+
+      - name: Upload Management EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: DROPLINK-Management-Windows
+          path: DROPLINK-Management.exe
           if-no-files-found: error
