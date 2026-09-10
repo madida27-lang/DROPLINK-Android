@@ -27,7 +27,16 @@ public class MainActivity extends Activity {
         settings.setDisplayZoomControls(false);
 
         webView.addJavascriptInterface(new AndroidBridge(), "Android");
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                view.evaluateJavascript(
+                    "(function(){var s=document.createElement('script');s.src='file:///android_asset/tip.js';document.body.appendChild(s);})();",
+                    null
+                );
+            }
+        });
         webView.loadUrl("file:///android_asset/index.html");
     }
 
