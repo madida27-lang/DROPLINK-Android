@@ -1,0 +1,46 @@
+name: Build signed DROPLINK Play Store AABs
+on: { workflow_dispatch: {} }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.13' }
+      - name: Install Android SDK 36
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+      - name: Restore upload keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > upload-keystore.jks
+      - name: Configure signing and build
+        env:
+          KS_FILE: ${{ github.workspace }}/upload-keystore.jks
+          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KS_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KS_KEY_PASS: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          for module in customer app; do
+            cat >> "$module/build.gradle" <<'GRADLE'
+          android {
+            signingConfigs {
+              release {
+                storeFile file(System.getenv('KS_FILE'))
+                storePassword System.getenv('KS_PASS')
+                keyAlias System.getenv('KS_ALIAS')
+                keyPassword System.getenv('KS_KEY_PASS')
+              }
+            }
+            buildTypes.release.signingConfig signingConfigs.release
+          }
+          GRADLE
+          done
+          gradle :customer:bundleRelease :app:bundleRelease --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: droplink-signed-aabs
+          path: |
+            customer/build/outputs/bundle/release/customer-release.aab
+            app/build/outputs/bundle/release/app-release.aab

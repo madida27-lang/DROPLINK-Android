@@ -1,0 +1,13 @@
+DROPLINK
+Short description:
+Fast local parcel delivery with live order status and driver communication.
+
+Full description:
+DROPLINK connects customers with delivery drivers through one simple delivery platform. Create a delivery, enter pickup and drop-off details, choose the package size and payment method, add an optional driver tip, follow delivery progress, and communicate with the assigned driver through trip chat.
+
+DROPLINK Driver
+Short description:
+Receive assigned deliveries, navigate, update status and submit proof of delivery.
+
+Full description:
+DROPLINK Driver is for approved DROPLINK delivery drivers. Drivers can securely sign in, view assigned deliveries, contact customers, open navigation, update delivery progress, use trip chat, share location while the app is in use, and submit proof of delivery.
